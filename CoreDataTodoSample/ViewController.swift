@@ -17,6 +17,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return table
     }()
     
+    private var models = [TodoListItem]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Core Data To Do List"
@@ -28,12 +30,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return models.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = models[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = "Hello World"
+        cell.textLabel?.text = model.name
         return cell
     }
     
@@ -41,7 +44,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     func getAllItems() {
         do {
-            let items = try context.fetch(TodoListItem.fetchRequest())
+            models = try context.fetch(TodoListItem.fetchRequest())
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
         catch {
             // error
